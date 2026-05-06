@@ -1,0 +1,295 @@
+{
+  "info": {
+    "name": "SAP Adapter API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "bp_id",
+      "value": "BP001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Root",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('api is running', () => pm.expect(pm.response.json().status).to.eql('SAP adapter API is running'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "OAuth Token",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/oauth/token"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('token returned', () => { const json = pm.response.json(); pm.expect(json.access_token).to.eql('dummy-token'); pm.expect(json.token_type).to.eql('bearer'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Business Partner",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set('bp_id', 'BP' + Date.now());"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('business partner created', () => { const json = pm.response.json(); pm.expect(json.bp_id).to.eql(pm.collectionVariables.get('bp_id')); pm.expect(json.name).to.eql('Acme PostgreSQL Ltd'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bp_id\": \"{{bp_id}}\",\n  \"name\": \"Acme PostgreSQL Ltd\"\n}"
+        },
+        "url": "{{base_url}}/business_partner/"
+      }
+    },
+    {
+      "name": "Get Business Partner",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/business_partner/{{bp_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('business partner fetched', () => { const json = pm.response.json(); pm.expect(json.bp_id).to.eql(pm.collectionVariables.get('bp_id')); pm.expect(json.name).to.eql('Acme PostgreSQL Ltd'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Bank Account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bp_id\": \"{{bp_id}}\",\n  \"account_number\": \"9876543210\",\n  \"bank_code\": \"BANK01\"\n}"
+        },
+        "url": "{{base_url}}/bank/"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('bank account created', () => { const json = pm.response.json(); pm.expect(json.bp_id).to.eql(pm.collectionVariables.get('bp_id')); pm.expect(json.account_number).to.eql('9876543210'); pm.expect(json.bank_code).to.eql('BANK01'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Bank Accounts",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/bank/{{bp_id}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('bank account fetched', () => { const json = pm.response.json(); pm.expect(json[0].bp_id).to.eql(pm.collectionVariables.get('bp_id')); pm.expect(json[0].account_number).to.eql('9876543210'); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Company Code T001",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/tables/T001/1000"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('company fetched', () => pm.expect(pm.response.json().name).to.eql('PostgreSQL Test Company'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Payment Term T052",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/tables/T052/NET30"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('payment term fetched', () => pm.expect(pm.response.json().description).to.eql('Net 30 days'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Tax Code T007A",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/tables/T007A/A1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('tax code fetched', () => pm.expect(pm.response.json().rate).to.eql(18));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Bank Master BNKA",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/tables/BNKA/BANK01"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('bank master fetched', () => pm.expect(pm.response.json().bank_name).to.eql('PostgreSQL Test Bank'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validate Reference Data - Valid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bukrs\": \"1000\",\n  \"zterm\": \"NET30\",\n  \"mwskz\": \"A1\",\n  \"bankl\": \"BANK01\"\n}"
+        },
+        "url": "{{base_url}}/tables/validate"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('valid result', () => pm.expect(pm.response.json().status).to.eql('VALID'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validate Reference Data - Invalid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"bukrs\": \"1000\",\n  \"zterm\": \"NET30\",\n  \"mwskz\": \"A1\",\n  \"bankl\": \"UNKNOWN\"\n}"
+        },
+        "url": "{{base_url}}/tables/validate"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "pm.test('invalid result', () => pm.expect(pm.response.json().status).to.eql('INVALID'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
