@@ -7,7 +7,7 @@ FastAPI SAP adapter with business partner, bank account, SAP reference-table val
 Go to the API folder:
 
 ```powershell
-cd exter_nal_api
+cd external_api
 ```
 
 Install dependencies:
@@ -41,7 +41,7 @@ http://127.0.0.1:8000/docs
 Go to the API folder first:
 
 ```powershell
-cd exter_nal_api
+cd external_api
 ```
 
 Run all SQLite-backed endpoint tests:
@@ -73,7 +73,7 @@ Import `postman_collection.json` into Postman and run the collection against `ht
 Start the API before testing:
 
 ```powershell
-cd exter_nal_api
+cd external_api
 python -m uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
@@ -544,3 +544,4 @@ Expected output:
 ```text
 All endpoints passed live smoke testing.
 ```
+
